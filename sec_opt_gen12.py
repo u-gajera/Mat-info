@@ -36,10 +36,12 @@ cleaning_the_dataset(dataset_material)
 column_name = formula_reader.columns_name(dataset_atomic_columns=dataset_atomic.keys()[2:-1], 
                            num_of_element=['A','B'])
 
+#one possible way to input the equation
 equation_list = ['(rp_B**3 - exp(rs_B))/((rp_A**2))', 
                  '(sqrt(fabs(EA_A))+sqrt(fabs(IP_B)))/((rp_A**2))']
 
 
+#read the equation from the excel file
 df_form = pd.read_excel('Final wrap up.xlsx', sheet_name='ZincBlend 1D')
 
 all_num,all_equations,all_avg_mse = [],[],[]
@@ -52,6 +54,7 @@ for str_lst in df_form['OAD_gen_1 RMSE']:
     except:
         pass
 
+#main part to calculate second optimization
 new_equation_list = []
 old_rmse, old_r2, old_cls   =[],[],[]
 new_rmse, new_r2, new_cls   =[],[],[]
@@ -60,7 +63,7 @@ min_slops, min_intercepts   =[],[]
 r2_scores, cls_acss         =[],[]
 regression = 'On'
 rounding   = 12
-target_property = 'r2_score' # 'RMSE' or 'classification_accuracy'
+target_property = 'classification_accuracy'#'r2_score' # 'RMSE' or 
 
 actute_species = ['RS' if i < 0 else 'ZB' for i in dataset_test.DE]
 def target_func(pred, actu):
@@ -97,8 +100,8 @@ for equation in all_equations[:10]:#+all_equations[4:7]+all_equations[8:9]:
     intercept = regressor.intercept_
     
     temp_rmse, value_lst, temp_r2, temp_cls_acs = [],[],[],[]
-    for ii in np.arange(-1.1,1.1,0.01):
-        for jj in np.arange(-1.1,1.1,0.01):
+    for ii in np.arange(-1.1,1.1,0.1):
+        for jj in np.arange(-1.1,1.1,0.1):
                 if np.round(ii,4)==0. or np.round(jj,4)==0.:
                     pass
                 else:
@@ -174,7 +177,7 @@ for equation in all_equations[:10]:#+all_equations[4:7]+all_equations[8:9]:
     min_intercepts.append(intercepts[args])
 
 
-
+#Collecting all the informations and saving it to file
 df = pd.DataFrame()
 df['Equations'] = new_equation_list
 df['old_rmse_for_full_dataset']=old_rmse
@@ -187,8 +190,9 @@ df['individual_coeff'] = coeff_list
 df['slops'] = [round(num[0], 3) for num in min_slops]
 df['intecepts'] = min_intercepts
 
-df.to_excel('optimization_using_r2_score.xlsx')
+df.to_excel('optimization_using_class_score.xlsx')
 
+# testing the equation separately
 test_func = 0.633*(-0.85*dataset_test['rp_B'].values**2+1.09*np.exp(dataset_test['rs_B'].values))/dataset_test['rp_A'].values**2  -0.341319
 
 pred_species = ['RS' if i < 0 else 'ZB' for i in test_func]
