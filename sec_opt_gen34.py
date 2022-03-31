@@ -85,7 +85,7 @@ def args_ind(target_property, temp_rmse, temp_cls_acs, temp_r2):
     
     return args
         
-for equation in all_equations[21:32]+all_equations[34:38]+all_equations[40:41]:
+for equation in all_equations[21:22]#+all_equations[34:38]+all_equations[40:41]:
     slops, intercepts = [],[]
     equation = equation.replace('HOMOKS','HOMO')
     equation = equation.replace('LUMOKS','LUMO')
